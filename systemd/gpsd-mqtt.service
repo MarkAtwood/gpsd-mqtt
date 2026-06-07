@@ -1,0 +1,33 @@
+[Unit]
+Description=gpsd-to-MQTT bridge (Home Assistant discovery)
+Documentation=https://github.com/MarkAtwood/gpsd-mqtt
+After=network-online.target gpsd.service
+Wants=network-online.target
+# Optional: only run if gpsd is around.
+# Requires=gpsd.service
+
+[Service]
+Type=simple
+# Config (incl. MQTT credentials) lives in this env file, root:0600.
+EnvironmentFile=/etc/default/gpsd-mqtt
+ExecStart=/usr/local/bin/gpsd-mqtt
+Restart=on-failure
+RestartSec=5
+
+# Hardening: this daemon needs only outbound TCP (gpsd + MQTT).
+DynamicUser=yes
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictAddressFamilies=AF_INET AF_INET6
+RestrictNamespaces=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+
+[Install]
+WantedBy=multi-user.target
