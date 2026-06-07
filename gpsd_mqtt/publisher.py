@@ -106,8 +106,8 @@ class HaMqttPublisher:
         return {
             "identifiers": [self.cfg.device_id],
             "name": self.cfg.device_name,
-            "manufacturer": "gpsd",
-            "model": "gpsd MQTT bridge",
+            "manufacturer": self.cfg.device_manufacturer,
+            "model": self.cfg.device_model,
         }
 
     def _publish_discovery(self) -> None:

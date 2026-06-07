@@ -39,6 +39,8 @@ class Config:
     topic_base: str = "gpsd"
     device_id: str = "gpsd"
     device_name: str = "GPS (gpsd)"
+    device_manufacturer: str = "gpsd"
+    device_model: str = "gpsd MQTT bridge"
 
     interval: float = 2.0
     expire_after: int = 120
@@ -116,6 +118,14 @@ class Config:
             default=env.get("GPSD_MQTT_DEVICE_NAME", defaults.device_name),
         )
         p.add_argument(
+            "--device-manufacturer",
+            default=env.get("GPSD_MQTT_DEVICE_MANUFACTURER", defaults.device_manufacturer),
+        )
+        p.add_argument(
+            "--device-model",
+            default=env.get("GPSD_MQTT_DEVICE_MODEL", defaults.device_model),
+        )
+        p.add_argument(
             "--interval", type=float,
             default=float(env.get("GPSD_MQTT_INTERVAL", defaults.interval)),
         )
@@ -143,6 +153,8 @@ class Config:
             topic_base=a.topic_base,
             device_id=a.device_id,
             device_name=a.device_name,
+            device_manufacturer=a.device_manufacturer,
+            device_model=a.device_model,
             interval=a.interval,
             expire_after=a.expire_after,
             log_level=a.log_level.upper(),

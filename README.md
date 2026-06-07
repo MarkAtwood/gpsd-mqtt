@@ -78,9 +78,16 @@ gpsd-mqtt
 | `GPSD_MQTT_TOPIC_BASE` | `--topic-base` | `gpsd` | state topic base |
 | `GPSD_MQTT_DEVICE_ID` | `--device-id` | `gpsd_<hostname>` | HA device id (groups entities) |
 | `GPSD_MQTT_DEVICE_NAME` | `--device-name` | `GPS (gpsd)` | HA device name |
+| `GPSD_MQTT_DEVICE_MANUFACTURER` | `--device-manufacturer` | `gpsd` | HA device manufacturer |
+| `GPSD_MQTT_DEVICE_MODEL` | `--device-model` | `gpsd MQTT bridge` | HA device model |
 | `GPSD_MQTT_INTERVAL` | `--interval` | `2.0` | min seconds between publishes |
 | `GPSD_MQTT_EXPIRE_AFTER` | `--expire-after` | `120` | HA staleness timeout (s) |
 | `GPSD_MQTT_LOG_LEVEL` | `--log-level` | `INFO` | log level |
+
+To attach these entities to an **existing** Home Assistant device (e.g. one
+created by another integration), set `GPSD_MQTT_DEVICE_ID` to that device's
+identifier; matching its `DEVICE_MANUFACTURER`/`DEVICE_MODEL` avoids HA
+rewriting the device's metadata.
 
 ## systemd
 
