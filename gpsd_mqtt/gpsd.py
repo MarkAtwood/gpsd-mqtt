@@ -15,8 +15,8 @@ import json
 import logging
 import socket
 import time
-from dataclasses import dataclass
-from typing import Dict, Iterator, Optional
+from dataclasses import dataclass, field
+from typing import Dict, Iterator, List, Optional
 
 log = logging.getLogger(__name__)
 
@@ -44,6 +44,8 @@ class GpsState:
     hdop: Optional[float] = None
     pdop: Optional[float] = None
     vdop: Optional[float] = None
+    # Per-satellite skyview rows (az/el present), for a polar plot in HA.
+    satellites: List[Dict] = field(default_factory=list)
 
     @property
     def mode_name(self) -> str:
@@ -84,6 +86,20 @@ class GpsState:
         if isinstance(sats, list):
             self.satellites_seen = len(sats)
             self.satellites_used = sum(1 for s in sats if s.get("used"))
+            # Keep only satellites with a sky position, for the polar skyview.
+            self.satellites = [
+                {
+                    "prn": s.get("PRN"),
+                    "gnssid": s.get("gnssid"),
+                    "svid": s.get("svid"),
+                    "az": s.get("az"),
+                    "el": s.get("el"),
+                    "ss": s.get("ss"),
+                    "used": bool(s.get("used", False)),
+                }
+                for s in sats
+                if s.get("az") is not None and s.get("el") is not None
+            ]
         # Explicit counts, if gpsd supplies them, are authoritative.
         if "nSat" in r:
             self.satellites_seen = r["nSat"]

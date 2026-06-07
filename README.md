@@ -109,6 +109,8 @@ After the first run, HA shows a device (named by `GPSD_MQTT_DEVICE_NAME`) with:
 - **Satellites used**, **Satellites in view**
 - **HDOP**, **PDOP**
 - **Fix time** (timestamp)
+- **Skyview** — count of positioned satellites, with a `satellites` attribute
+  holding per-satellite `az`/`el`/`ss`/`used` rows (for a polar sky plot)
 
 ## Development
 

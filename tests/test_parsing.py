@@ -63,6 +63,29 @@ def test_sky_satellites_from_array():
     assert state.vdop == 1.2
 
 
+def test_sky_skyview_rows_keep_positioned_sats():
+    state = GpsState()
+    state.update_sky({
+        "class": "SKY", "device": "/dev/ttyUSB0",
+        "satellites": [
+            {"PRN": 1, "gnssid": 0, "svid": 1, "az": 90.0, "el": 45.0,
+             "ss": 38.0, "used": True},
+            {"PRN": 2, "gnssid": 0, "svid": 2, "az": 180.0, "el": 10.0,
+             "ss": 22.0, "used": False},
+            # No az/el: counts toward totals but is not a plottable skyview row.
+            {"PRN": 3, "used": False},
+        ],
+    })
+    assert state.satellites_seen == 3
+    assert state.satellites_used == 1
+    rows = state.satellites
+    assert len(rows) == 2  # only the two with az/el
+    assert rows[0] == {"prn": 1, "gnssid": 0, "svid": 1, "az": 90.0,
+                       "el": 45.0, "ss": 38.0, "used": True}
+    assert rows[1]["used"] is False
+    assert rows[1]["az"] == 180.0
+
+
 def test_sky_explicit_counts_override_array():
     state = GpsState()
     # gpsd may supply nSat/uSat alongside a (possibly truncated) array;

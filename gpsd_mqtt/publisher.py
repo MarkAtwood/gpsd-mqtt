@@ -150,7 +150,27 @@ class HaMqttPublisher:
             f"{prefix}/binary_sensor/{dev_id}/has_fix/config",
             json.dumps(fix_cfg), qos=1, retain=True,
         )
-        log.info("published HA discovery (%d sensors + fix binary_sensor)", len(SENSORS))
+
+        # Skyview sensor: state is the count of positioned satellites; the
+        # per-satellite rows (az/el/ss/used) ride along as a JSON attribute for
+        # a polar plot in HA.
+        skyview_cfg = {
+            "name": "Skyview",
+            "unique_id": f"{dev_id}_skyview",
+            "object_id": f"{dev_id}_skyview",
+            "state_topic": self.cfg.state_topic("skyview"),
+            "json_attributes_topic": self.cfg.state_topic("skyview_attributes"),
+            "availability_topic": self.cfg.availability_topic,
+            "expire_after": self.cfg.expire_after,
+            "icon": "mdi:satellite-uplink",
+            "state_class": "measurement",
+            "device": device,
+        }
+        self._client.publish(
+            f"{prefix}/sensor/{dev_id}/skyview/config",
+            json.dumps(skyview_cfg), qos=1, retain=True,
+        )
+        log.info("published HA discovery (%d sensors + fix + skyview)", len(SENSORS))
 
     # ---- state -------------------------------------------------------------
     def publish_state(self, state: GpsState) -> None:
@@ -176,4 +196,12 @@ class HaMqttPublisher:
         self._client.publish(
             self.cfg.state_topic("has_fix"),
             "ON" if state.has_fix else "OFF", qos=0,
+        )
+        # Skyview: count + per-satellite rows as a JSON attribute payload.
+        self._client.publish(
+            self.cfg.state_topic("skyview"), str(len(state.satellites)), qos=0,
+        )
+        self._client.publish(
+            self.cfg.state_topic("skyview_attributes"),
+            json.dumps({"satellites": state.satellites}), qos=0,
         )
